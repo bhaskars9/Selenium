@@ -1,0 +1,16 @@
+archives/
+download/
+Notes/
+
+
+*.html
+*.txt
+*.csv
+*.jpg
+*.png
+*.docx
+*.pdf
+*.bat
+
+*.env
+
