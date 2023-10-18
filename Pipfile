@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 selenium = "*"
 bs4 = "*"
+boto3 = "*"
+pandas = "*"
 
 [dev-packages]
 

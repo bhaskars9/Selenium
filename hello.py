@@ -1,11 +1,14 @@
 from  includes.config import driver_path, brave_path, database_path
-
+import pandas as pd
+from datetime import datetime as dt
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import sys
+import argparse
 
 from includes.utils import *
 from includes.data_manager import *
@@ -22,7 +25,40 @@ db.connect()
 db.create_table()
 
 # navigate to a web page
-driver.get('https://ca.indeed.com/jobs?q=azure+data+engineer&fromage=7')
+role = "azure data engineer"
+location = "CA"
+to_email = None
+locations = ['Ottawa, ON','Toronto, ON', 'Alberta', 'Manitoba', 'Thunder Bay', 'Sasktchewan', 'Nova Scotia', 'Newfoundland and Labrador', 'British Columbia', 'Canada']
+    
+# input parameters
+if(len(sys.argv)>1):
+    # Command line argumented detected
+    parser = argparse.ArgumentParser()
+    # parser.add_argument('--l', help='Location')
+    parser.add_argument('--r', help='Role')
+    parser.add_argument('--d', default=7, const=14, nargs='?', choices=[1,3,7,14], help='Date Posted', type=int)
+    parser.add_argument('--e', help='receiver email')
+    parser.parse_args()
+    args = parser.parse_args()
+    # location = args.l
+    role = args.r
+    date_posted = args.d
+    to_email = args.e
+else:
+    # command line input needed
+    print()
+    for idx, loc in enumerate(locations):
+        print(f'{idx+1}. {loc}')
+    # l = int(input('\nSelect location: ')) # 1
+    # location = locations[l-1]
+    role = input(f'Search role?: ') # Software Engineer
+    date_posted = input(f'Date posted? (1,3,7,14): ') # Software Engineer
+
+
+driver.get(f'https://ca.indeed.com/jobs?q={role}&fromage={date_posted}')
+
+
+
 
 # let it load
 wait(5)
@@ -66,11 +102,10 @@ while (True):
     # parse job data, save to db
     for j in jobs:
             rec = indeed_parser(j)
-            jk = rec['link'][33:]
-            if(not db.job_exists(jk)):
+            if(not db.job_exists(rec['link'])):
                 # new job posting
                 job_postings.append(rec)
-                db.insert_record(Job(jk, rec['location'], rec['title']))
+                db.insert_record(Job(rec['link'], rec['location'], rec['title']))
 
     wait(5)
 
@@ -89,24 +124,26 @@ while (True):
     wait(5)
 
 
-# pending work
-# if(len(job_postings)):
-#         # save to database
-#         df = pd.DataFrame(job_postings)
-#         name = dt.now().strftime(f"%y.%m.%d {role} {location} %I.%M.%S %p")
-#         # write csv files
-#         df.to_csv(f'indeed_data/{name}.csv', index=False, header=True)
-#         # send email
-#         load_dotenv()
-#         send_email({
-#             'from' : os.environ.get("FROM"),
-#             'to' : os.environ.get("TO"),
-#             'role' : role,
-#             'text' : name,
-#             'jobs': postings
-#         })
 
-wait(1800)
+if(len(job_postings)):
+    # save to database
+    df = pd.DataFrame(job_postings)
+    name = dt.now().strftime(f"%y.%m.%d {role} {location} %I.%M.%S %p")
+    # write csv files
+    df.to_csv(f'artifacts/{name}.csv', index=False, header=True)
+    # send email
+    load_dotenv()
+    if (to_email is None):
+        to_email = os.environ.get("TO")
+    send_email({
+        'from' : os.environ.get("FROM"),
+        'to' : to_email,
+        'role' : role,
+        'text' : name,
+        'jobs': job_postings
+    })
+
+wait(10)
 
 
 # driver.find_element(By.CSS_SELECTOR,'div.job_seen_beacon').click()

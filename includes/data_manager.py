@@ -53,13 +53,39 @@ class DatabaseManager:
             rows = cursor.fetchall()
             for row in rows:
                 print("ID:", row[0])
-                print("Job link: https://ca.indeed.com/viewjob?jk="+row[1])
+                print("Job link: "+row[1])
                 print("Location:", row[2])
                 print("Role:", row[3])
                 print("Date:", row[4])
                 print("------------")
         except sqlite3.Error as e:
             print("Error retrieving records:", e)
+
+    def add_column(self, new_col, dtype='VARCHAR(50)', def_val = ''):
+        query = f"ALTER TABLE Jobs ADD {new_col} {dtype} DEFAULT {def_val}"
+        try:
+            self.conn.execute(query)
+            self.conn.commit()
+            print("Column added successfully.")
+        except sqlite3.Error as e:
+            print("Error Adding column:", e)
+
+
+    def custom_query(self, query):
+        """No output is returned"""
+        try:
+            self.conn.execute(query)
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print("Error Processing query:", e)
+    
+    def custom_retrive(self, query):
+        try:
+            cursor = self.conn.execute(query)
+            rows = cursor.fetchall()
+            return (list(map(lambda x: x[0], cursor.description)), rows)
+        except sqlite3.Error as e:
+            print("Error Processing query:", e)
 
     def close_connection(self):
         if self.conn:
