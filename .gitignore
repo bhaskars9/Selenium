@@ -10,6 +10,7 @@ notes/
 *.docx
 *.pdf
 *.bat
+*.json
 
 *.env
 

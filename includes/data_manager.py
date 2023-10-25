@@ -19,11 +19,20 @@ class DatabaseManager:
             print("Error connecting to the database:", e)
 
     def create_table(self):
+        """
+        id : Primary Key
+        jk : Job posting url (initially just jk is job key later updated)
+        location : Job location
+        role : Job title
+        desc : Job Description
+        date : Scrapped time
+        """
         query = '''CREATE TABLE IF NOT EXISTS Jobs
                   (id INTEGER PRIMARY KEY,
-                  jk VARCHAR(40),
+                  jk VARCHAR(100),
                   location TEXT,
                   role TEXT,
+                  desc TEXT,
                   date DATETIME DEFAULT CURRENT_TIMESTAMP)'''
         try:
             self.conn.execute(query)
@@ -33,9 +42,9 @@ class DatabaseManager:
             print("Error creating table:", e)
 
     def insert_record(self, Job):
-        query = '''INSERT INTO Jobs (jk, role, location) VALUES (?, ?, ?)'''
+        query = '''INSERT INTO Jobs (jk, role, location, desc) VALUES (?, ?, ?, ?)'''
         try:
-            self.conn.execute(query, (Job.jk, Job.role, Job.location))
+            self.conn.execute(query, (Job.jk, Job.role, Job.location, Job.desc))
             self.conn.commit()
             print("Record inserted successfully.")
         except sqlite3.Error as e:
@@ -61,8 +70,8 @@ class DatabaseManager:
         except sqlite3.Error as e:
             print("Error retrieving records:", e)
 
-    def add_column(self, new_col, dtype='VARCHAR(50)', def_val = ''):
-        query = f"ALTER TABLE Jobs ADD {new_col} {dtype} DEFAULT {def_val}"
+    def add_column(self, col_name, dtype='VARCHAR(50)', def_val = 'NA'):
+        query = f"ALTER TABLE Jobs ADD {col_name} {dtype} DEFAULT {def_val}"
         try:
             self.conn.execute(query)
             self.conn.commit()
@@ -99,10 +108,11 @@ class DatabaseManager:
 
 
 class Job:
-    def __init__(self, jk, location, role):
+    def __init__(self, jk, location, role, desc):
         self.jk = jk
         self.location = location
         self.role = role
+        self.desc = desc
 
 
 
