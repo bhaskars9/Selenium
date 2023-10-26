@@ -14,3 +14,5 @@ notes/
 
 *.env
 
+db.py
+builder.py
