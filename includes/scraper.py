@@ -31,7 +31,6 @@ def get_job_description(j, driver):
         # wait for it to load description
         wait(5)
         desc = driver.find_element(By.CSS_SELECTOR,'div[id="jobDescriptionText"]').text
-        driver.execute_script("window.scrollBy(0, 150);")
         return desc
         # print(desc)
     except Exception  as e:
@@ -51,7 +50,7 @@ def goto_nextpage(driver):
         nav = driver.find_element(By.CSS_SELECTOR,'nav[aria-label="pagination"]')
     except Exception as e:
         print('single page')
-        driver_snapshot(driver, 'single_page')
+        # driver_snapshot(driver, 'single_page')
         return False
     
     # click on next page if exists
@@ -59,7 +58,7 @@ def goto_nextpage(driver):
         nav.find_element(By.CSS_SELECTOR,'a[aria-label="Next Page"]').click()
         return True
     except Exception  as e:
-        driver_snapshot(driver,'lastpage')
+        # driver_snapshot(driver,'lastpage')
         # print("Element not found:", e)
         print('last page reached')
         return False
@@ -117,12 +116,14 @@ class WebScraper:
             for j in driver.find_elements(By.CSS_SELECTOR,'div[class="job_seen_beacon"]'):
                 # parse basic data
                 rec = indeed_parser(BeautifulSoup(j.get_attribute('outerHTML'), 'html.parser'))
+                # imitate human activity
+                driver.execute_script("window.scrollBy(0, 150);")
                 if(not db.job_exists(rec['link'])):
                     rec['desc'] = get_job_description(j, driver)
                     # print(rec['title'])
                     self.job_postings.append(rec)
                     db.insert_record(Job(rec['link'], rec['location'], rec['title'], rec['desc']))
-            wait(1)
+            wait(2)
 
             if(not goto_nextpage(driver)): 
                 print("That's the end, Happy applying :) ")

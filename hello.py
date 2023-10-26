@@ -41,7 +41,7 @@ driver.refresh()
 # wait for 5 seconds
 wait(3)
 
-# close popup if it covers the screen
+
 try:
     driver.find_element(By.CSS_SELECTOR,'div[class="true"]')\
         .find_element(By.CSS_SELECTOR,'button[aria-label="close"]').click()

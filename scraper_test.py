@@ -12,11 +12,14 @@ with open(file_name,'r') as json_file:
 
 ws = WebScraper(config['paths'], config['name'])
 
-ws.scrape_indeed(params = config['search_params'])
+for params in config['search_params']:
+    ws.scrape_indeed(params=params)
 
 ws.save_artifact()
 
 ws.email_results(config['email'])
+
+
 
 
 
