@@ -8,8 +8,6 @@ file_name = 'config.json'
 with open(file_name,'r') as json_file:
     config = json.load(json_file)
 
-
-
 ws = WebScraper(config['paths'], config['name'])
 
 for params in config['search_params']:

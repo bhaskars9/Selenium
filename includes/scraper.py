@@ -52,7 +52,6 @@ def goto_nextpage(driver):
         print('single page')
         # driver_snapshot(driver, 'single_page')
         return False
-    
     # click on next page if exists
     try:
         nav.find_element(By.CSS_SELECTOR,'a[aria-label="Next Page"]').click()
