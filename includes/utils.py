@@ -121,10 +121,8 @@ def printjobs(driver):
 def get_job_data(html):
     """
     returns elements containing job data from Indeed
-    
     Args:
         html (BeautifulSoup): html page to search
-        
     Returns:
         list: list of job elements
     """
@@ -133,10 +131,8 @@ def get_job_data(html):
 def indeed_parser(elem):
     """
     parses job data from given element
-    
     Args:
         elem (BeautifulSoup): element containg job post data
-        
     Returns:
         job (dict): list of job elements, next page
     """

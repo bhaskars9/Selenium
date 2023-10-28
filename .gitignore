@@ -14,5 +14,6 @@ notes/
 
 *.env
 
-db.py
 builder.py
+db.py
+scraper_test.py
